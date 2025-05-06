@@ -1,0 +1,42 @@
+# dvc.yaml
+stages:
+  clean_data:
+    cmd: python3 src/clean_data.py
+    deps:
+      - src/clean_data.py
+      - data/raw/data.csv
+    params:
+      - clean_data
+    outs:
+      - data/processed/cleaned_data.csv
+
+  feature_engineering:
+    cmd: python3 src/feature_engineer.py
+    deps:
+      - src/feature_engineer.py
+      - data/processed/cleaned_data.csv
+    params:
+      - feature_engineering
+    outs:
+      - data/features/features.csv
+
+  train:
+    cmd: python3 src/train_model.py
+    deps:
+      - src/train_model.py
+      - data/features/features.csv
+    params:
+      - train
+    outs:
+      - models/model.pkl
+
+  evaluate:
+    cmd: python3 src/evaluate.py
+    deps:
+      - src/evaluate.py
+      - models/model.pkl
+      - data/features/features.csv
+    params:
+      - evaluate
+    outs:
+      - metrics/scores.json

@@ -1,0 +1,107 @@
+schema: '2.0'
+stages:
+  clean_data:
+    cmd: python3 src/clean_data.py
+    deps:
+    - path: data/raw/data.csv
+      hash: md5
+      md5: d288eb65a7142ed81be1fed8cca9d947
+      size: 44225
+    - path: src/clean_data.py
+      hash: md5
+      md5: 0a70b5b8a7212e3da2936bfa72661f06
+      size: 331
+    params:
+      params.yaml:
+        clean_data:
+          input_path: data/raw/data.csv
+          output_path: data/processed/cleaned_data.csv
+          params:
+            drop_na: true
+            fill_value: 0
+    outs:
+    - path: data/processed/cleaned_data.csv
+      hash: md5
+      md5: 1ac1c3b581811722a3322756d54c5872
+      size: 45385
+  feature_engineering:
+    cmd: python3 src/feature_engineer.py
+    deps:
+    - path: data/processed/cleaned_data.csv
+      hash: md5
+      md5: 1ac1c3b581811722a3322756d54c5872
+      size: 45385
+    - path: src/feature_engineer.py
+      hash: md5
+      md5: e22f3282b0d53ae8d26f021622700304
+      size: 832
+    params:
+      params.yaml:
+        feature_engineering:
+          input_path: data/processed/cleaned_data.csv
+          output_path: data/features/features.csv
+          params:
+            new_features:
+            - ratio_feature
+            - interaction_feature
+    outs:
+    - path: data/features/features.csv
+      hash: md5
+      md5: a41f7b6fc00bbab41afa19443a1003c7
+      size: 63776
+  train:
+    cmd: python3 src/train_model.py
+    deps:
+    - path: data/features/features.csv
+      hash: md5
+      md5: a41f7b6fc00bbab41afa19443a1003c7
+      size: 63776
+    - path: src/train_model.py
+      hash: md5
+      md5: 3bc59124eae5a531425ec91a7fcbb875
+      size: 818
+    params:
+      params.yaml:
+        train:
+          input_path: data/features/features.csv
+          output_path: models/model.pkl
+          params:
+            model_type: random_forest
+            n_estimators: 100
+            random_state: 42
+    outs:
+    - path: models/model.pkl
+      hash: md5
+      md5: 5163eaf06b54e4497d1bec4ab132b250
+      size: 3444889
+  evaluate:
+    cmd: python3 src/evaluate.py
+    deps:
+    - path: data/features/features.csv
+      hash: md5
+      md5: a41f7b6fc00bbab41afa19443a1003c7
+      size: 63776
+    - path: models/model.pkl
+      hash: md5
+      md5: 5163eaf06b54e4497d1bec4ab132b250
+      size: 3444889
+    - path: src/evaluate.py
+      hash: md5
+      md5: 7fb16a8f1929477311e7b6b35f5b2bb1
+      size: 1248
+    params:
+      params.yaml:
+        evaluate:
+          input_path: models/model.pkl
+          test_data: data/features/features.csv
+          output_path: metrics/scores.json
+          params:
+            metrics:
+            - accuracy
+            - f1
+            - roc_auc
+    outs:
+    - path: metrics/scores.json
+      hash: md5
+      md5: c1f4c50014fa95663bb304a97ab8ef80
+      size: 103

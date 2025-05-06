@@ -1,0 +1,28 @@
+# params.yaml
+clean_data:
+  input_path: "data/raw/data.csv"
+  output_path: "data/processed/cleaned_data.csv"
+  params:
+    drop_na: true
+    fill_value: 0
+
+feature_engineering:
+  input_path: "data/processed/cleaned_data.csv"
+  output_path: "data/features/features.csv"
+  params:
+    new_features: ["ratio_feature", "interaction_feature"]
+
+train:
+  input_path: "data/features/features.csv"
+  output_path: "models/model.pkl"
+  params:
+    model_type: "random_forest"
+    n_estimators: 100
+    random_state: 42
+
+evaluate:
+  input_path: "models/model.pkl"
+  test_data: "data/features/features.csv"
+  output_path: "metrics/scores.json"
+  params:
+    metrics: ["accuracy", "f1", "roc_auc"]
