@@ -1,4 +1,3 @@
-# dvc.yaml
 stages:
   clean_data:
     cmd: python3 src/clean_data.py
